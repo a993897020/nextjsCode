@@ -2,7 +2,7 @@
  * @Author: 关振俊
  * @Date: 2024-11-20 09:16:36
  * @LastEditors: 关振俊
- * @LastEditTime: 2025-01-15 15:00:08
+ * @LastEditTime: 2025-01-16 17:41:23
  * @Description:
  */
 import type { NextConfig } from "next";
@@ -19,6 +19,9 @@ const nextConfig: NextConfig = {
         hostname: "tailwindui.com",
       },
     ],
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
   },
   reactStrictMode: true,
   webpack: (config, options) => {

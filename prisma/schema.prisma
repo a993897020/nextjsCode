@@ -13,7 +13,7 @@ model blog {
   content   String
   author    String
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @default(now())
 }
 
 model user {
@@ -21,5 +21,5 @@ model user {
   name      String
   email     String   @unique(map: "User_email_key")
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @default(now())
 }
