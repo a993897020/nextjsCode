@@ -1,0 +1,452 @@
+diff --git a/esm/vs/base/common/worker/simpleWorker.js b/esm/vs/base/common/worker/simpleWorker.js
+index 85005f72fa8f356259711355424370f4b52acb8f..911f1aaaeeac99c99882d57fed3519c53d867d9a 100644
+--- a/esm/vs/base/common/worker/simpleWorker.js
++++ b/esm/vs/base/common/worker/simpleWorker.js
+@@ -2,11 +2,22 @@
+  *  Copyright (c) Microsoft Corporation. All rights reserved.
+  *  Licensed under the MIT License. See License.txt in the project root for license information.
+  *--------------------------------------------------------------------------------------------*/
+-import { onUnexpectedError, transformErrorForSerialization } from '../errors.js';
+-import { Emitter } from '../event.js';
+-import { Disposable } from '../lifecycle.js';
+-import { FileAccess } from '../network.js';
+-import { isWeb } from '../platform.js';
++import {
++    onUnexpectedError,
++    transformErrorForSerialization
++} from '../errors.js';
++import {
++    Emitter
++} from '../event.js';
++import {
++    Disposable
++} from '../lifecycle.js';
++import {
++    FileAccess
++} from '../network.js';
++import {
++    isWeb
++} from '../platform.js';
+ import * as strings from '../strings.js';
+ // ESM-comment-begin
+ // const isESM = false;
+@@ -35,7 +46,7 @@ class RequestMessage {
+         this.channel = channel;
+         this.method = method;
+         this.args = args;
+-        this.type = 0 /* MessageType.Request */;
++        this.type = 0 /* MessageType.Request */ ;
+     }
+ }
+ class ReplyMessage {
+@@ -44,7 +55,7 @@ class ReplyMessage {
+         this.seq = seq;
+         this.res = res;
+         this.err = err;
+-        this.type = 1 /* MessageType.Reply */;
++        this.type = 1 /* MessageType.Reply */ ;
+     }
+ }
+ class SubscribeEventMessage {
+@@ -54,7 +65,7 @@ class SubscribeEventMessage {
+         this.channel = channel;
+         this.eventName = eventName;
+         this.arg = arg;
+-        this.type = 2 /* MessageType.SubscribeEvent */;
++        this.type = 2 /* MessageType.SubscribeEvent */ ;
+     }
+ }
+ class EventMessage {
+@@ -62,14 +73,14 @@ class EventMessage {
+         this.vsWorker = vsWorker;
+         this.req = req;
+         this.event = event;
+-        this.type = 3 /* MessageType.Event */;
++        this.type = 3 /* MessageType.Event */ ;
+     }
+ }
+ class UnsubscribeEventMessage {
+     constructor(vsWorker, req) {
+         this.vsWorker = vsWorker;
+         this.req = req;
+-        this.type = 4 /* MessageType.UnsubscribeEvent */;
++        this.type = 4 /* MessageType.UnsubscribeEvent */ ;
+     }
+ }
+ class SimpleWorkerProtocol {
+@@ -127,11 +138,9 @@ class SimpleWorkerProtocol {
+                         target[name] = (arg) => {
+                             return this.listen(channel, name, arg);
+                         };
+-                    }
+-                    else if (propertyIsEvent(name)) { // on...
++                    } else if (propertyIsEvent(name)) { // on...
+                         target[name] = this.listen(channel, name, undefined);
+-                    }
+-                    else if (name.charCodeAt(0) === 36 /* CharCode.DollarSign */) { // $...
++                    } else if (name.charCodeAt(0) === 36 /* CharCode.DollarSign */ ) { // $...
+                         target[name] = async (...myArgs) => {
+                             await sendMessageBarrier?.();
+                             return this.sendMessage(channel, name, myArgs);
+@@ -145,15 +154,15 @@ class SimpleWorkerProtocol {
+     }
+     _handleMessage(msg) {
+         switch (msg.type) {
+-            case 1 /* MessageType.Reply */:
++            case 1 /* MessageType.Reply */ :
+                 return this._handleReplyMessage(msg);
+-            case 0 /* MessageType.Request */:
++            case 0 /* MessageType.Request */ :
+                 return this._handleRequestMessage(msg);
+-            case 2 /* MessageType.SubscribeEvent */:
++            case 2 /* MessageType.SubscribeEvent */ :
+                 return this._handleSubscribeEventMessage(msg);
+-            case 3 /* MessageType.Event */:
++            case 3 /* MessageType.Event */ :
+                 return this._handleEventMessage(msg);
+-            case 4 /* MessageType.UnsubscribeEvent */:
++            case 4 /* MessageType.UnsubscribeEvent */ :
+                 return this._handleUnsubscribeEventMessage(msg);
+         }
+     }
+@@ -214,14 +223,13 @@ class SimpleWorkerProtocol {
+     }
+     _send(msg) {
+         const transfer = [];
+-        if (msg.type === 0 /* MessageType.Request */) {
++        if (msg.type === 0 /* MessageType.Request */ ) {
+             for (let i = 0; i < msg.args.length; i++) {
+                 if (msg.args[i] instanceof ArrayBuffer) {
+                     transfer.push(msg.args[i]);
+                 }
+             }
+-        }
+-        else if (msg.type === 1 /* MessageType.Reply */) {
++        } else if (msg.type === 1 /* MessageType.Reply */ ) {
+             if (msg.res instanceof ArrayBuffer) {
+                 transfer.push(msg.res);
+             }
+@@ -265,8 +273,7 @@ export class SimpleWorkerClient extends Disposable {
+         if (typeof globalRequire !== 'undefined' && typeof globalRequire.getConfig === 'function') {
+             // Get the configuration from the Monaco AMD Loader
+             loaderConfiguration = globalRequire.getConfig();
+-        }
+-        else if (typeof globalThis.requirejs !== 'undefined') {
++        } else if (typeof globalThis.requirejs !== 'undefined') {
+             // Get the configuration from requirejs
+             loaderConfiguration = globalThis.requirejs.s.contexts._.config;
+         }
+@@ -276,7 +283,9 @@ export class SimpleWorkerClient extends Disposable {
+             JSON.parse(JSON.stringify(loaderConfiguration)),
+             workerDescriptor.amdModuleId,
+         ]);
+-        this.proxy = this._protocol.createProxyToRemoteChannel(DEFAULT_CHANNEL, async () => { await this._onModuleLoaded; });
++        this.proxy = this._protocol.createProxyToRemoteChannel(DEFAULT_CHANNEL, async () => {
++            await this._onModuleLoaded;
++        });
+         this._onModuleLoaded.catch((e) => {
+             this._onError('Worker failed to load ' + workerDescriptor.amdModuleId, e);
+         });
+@@ -291,8 +300,7 @@ export class SimpleWorkerClient extends Disposable {
+         }
+         try {
+             return Promise.resolve(channel[method].apply(channel, args));
+-        }
+-        catch (e) {
++        } catch (e) {
+             return Promise.reject(e);
+         }
+     }
+@@ -325,10 +333,12 @@ export class SimpleWorkerClient extends Disposable {
+         console.info(error);
+     }
+ }
++
+ function propertyIsEvent(name) {
+     // Assume a property is an event if it has a form of "onSomething"
+     return name[0] === 'o' && name[1] === 'n' && strings.isUpperAsciiLetter(name.charCodeAt(2));
+ }
++
+ function propertyIsDynamicEvent(name) {
+     // Assume a property is a dynamic event (a method that returns an event) if it has a form of "onDynamicSomething"
+     return /^onDynamic/.test(name) && strings.isUpperAsciiLetter(name.charCodeAt(9));
+@@ -366,8 +376,7 @@ export class SimpleWorkerServer {
+         }
+         try {
+             return Promise.resolve(requestHandler[method].apply(requestHandler, args));
+-        }
+-        catch (e) {
++        } catch (e) {
+             return Promise.reject(e);
+         }
+     }
+@@ -426,6 +435,11 @@ export class SimpleWorkerServer {
+         }
+         if (isESM) {
+             const url = FileAccess.asBrowserUri(`${moduleId}.js`).toString(true);
++            // if (process.env.NODE_ENV === "development") {
++            if (process.env.TURBOPACK) {
++                throw new Error(`No RequestHandler!`);
++                return;
++            }
+             return import(`${url}`).then((module) => {
+                 this._requestHandler = module.create(this);
+                 if (!this._requestHandler) {
+diff --git a/esm/vs/editor/common/services/editorSimpleWorker.js b/esm/vs/editor/common/services/editorSimpleWorker.js
+index 91df4d4a6cda0a903a6e205b151e2a54e0d2098b..265c7e9f1816bcb78ce9c9d69f67ed6b9257594e 100644
+--- a/esm/vs/editor/common/services/editorSimpleWorker.js
++++ b/esm/vs/editor/common/services/editorSimpleWorker.js
+@@ -2,20 +2,49 @@
+  *  Copyright (c) Microsoft Corporation. All rights reserved.
+  *  Licensed under the MIT License. See License.txt in the project root for license information.
+  *--------------------------------------------------------------------------------------------*/
+-import { stringDiff } from '../../../base/common/diff/diff.js';
+-import { Range } from '../core/range.js';
+-import { computeLinks } from '../languages/linkComputer.js';
+-import { BasicInplaceReplace } from '../languages/supports/inplaceReplaceSupport.js';
+-import { createMonacoBaseAPI } from './editorBaseApi.js';
+-import { EditorWorkerHost } from './editorWorkerHost.js';
+-import { StopWatch } from '../../../base/common/stopwatch.js';
+-import { UnicodeTextModelHighlighter } from './unicodeTextModelHighlighter.js';
+-import { linesDiffComputers } from '../diff/linesDiffComputers.js';
+-import { createProxyObject, getAllMethodNames } from '../../../base/common/objects.js';
+-import { FileAccess } from '../../../base/common/network.js';
+-import { computeDefaultDocumentColors } from '../languages/defaultDocumentColorsComputer.js';
+-import { findSectionHeaders } from './findSectionHeaders.js';
+-import { WorkerTextModelSyncServer } from './textModelSync/textModelSync.impl.js';
++import {
++    stringDiff
++} from '../../../base/common/diff/diff.js';
++import {
++    Range
++} from '../core/range.js';
++import {
++    computeLinks
++} from '../languages/linkComputer.js';
++import {
++    BasicInplaceReplace
++} from '../languages/supports/inplaceReplaceSupport.js';
++import {
++    createMonacoBaseAPI
++} from './editorBaseApi.js';
++import {
++    EditorWorkerHost
++} from './editorWorkerHost.js';
++import {
++    StopWatch
++} from '../../../base/common/stopwatch.js';
++import {
++    UnicodeTextModelHighlighter
++} from './unicodeTextModelHighlighter.js';
++import {
++    linesDiffComputers
++} from '../diff/linesDiffComputers.js';
++import {
++    createProxyObject,
++    getAllMethodNames
++} from '../../../base/common/objects.js';
++import {
++    FileAccess
++} from '../../../base/common/network.js';
++import {
++    computeDefaultDocumentColors
++} from '../languages/defaultDocumentColorsComputer.js';
++import {
++    findSectionHeaders
++} from './findSectionHeaders.js';
++import {
++    WorkerTextModelSyncServer
++} from './textModelSync/textModelSync.impl.js';
+ // ESM-comment-begin
+ // const isESM = false;
+ // ESM-comment-end
+@@ -28,8 +57,7 @@ export class BaseEditorSimpleWorker {
+     constructor() {
+         this._workerTextModelSyncServer = new WorkerTextModelSyncServer();
+     }
+-    dispose() {
+-    }
++    dispose() {}
+     _getModel(uri) {
+         return this._workerTextModelSyncServer.getModel(uri);
+     }
+@@ -48,7 +76,13 @@ export class BaseEditorSimpleWorker {
+     async $computeUnicodeHighlights(url, options, range) {
+         const model = this._getModel(url);
+         if (!model) {
+-            return { ranges: [], hasMore: false, ambiguousCharacterCount: 0, invisibleCharacterCount: 0, nonBasicAsciiCharacterCount: 0 };
++            return {
++                ranges: [],
++                hasMore: false,
++                ambiguousCharacterCount: 0,
++                invisibleCharacterCount: 0,
++                nonBasicAsciiCharacterCount: 0
++            };
+         }
+         return UnicodeTextModelHighlighter.computeUnicodeHighlights(model, options, range);
+     }
+@@ -75,17 +109,18 @@ export class BaseEditorSimpleWorker {
+         const modifiedLines = modifiedTextModel.getLinesContent();
+         const result = diffAlgorithm.computeDiff(originalLines, modifiedLines, options);
+         const identical = (result.changes.length > 0 ? false : this._modelsAreIdentical(originalTextModel, modifiedTextModel));
++
+         function getLineChanges(changes) {
+             return changes.map(m => ([m.original.startLineNumber, m.original.endLineNumberExclusive, m.modified.startLineNumber, m.modified.endLineNumberExclusive, m.innerChanges?.map(m => [
+-                    m.originalRange.startLineNumber,
+-                    m.originalRange.startColumn,
+-                    m.originalRange.endLineNumber,
+-                    m.originalRange.endColumn,
+-                    m.modifiedRange.startLineNumber,
+-                    m.modifiedRange.startColumn,
+-                    m.modifiedRange.endLineNumber,
+-                    m.modifiedRange.endColumn,
+-                ])]));
++                m.originalRange.startLineNumber,
++                m.originalRange.startColumn,
++                m.originalRange.endLineNumber,
++                m.originalRange.endColumn,
++                m.modifiedRange.startLineNumber,
++                m.modifiedRange.startColumn,
++                m.modifiedRange.endLineNumber,
++                m.modifiedRange.endColumn,
++            ])]));
+         }
+         return {
+             identical,
+@@ -117,7 +152,9 @@ export class BaseEditorSimpleWorker {
+     }
+     // ---- END diff --------------------------------------------------------------------------
+     // ---- BEGIN minimal edits ---------------------------------------------------------------
+-    static { this._diffLimit = 100000; }
++    static {
++        this._diffLimit = 100000;
++    }
+     async $computeMoreMinimalEdits(modelUrl, edits, pretty) {
+         const model = this._getModel(modelUrl);
+         if (!model) {
+@@ -140,14 +177,17 @@ export class BaseEditorSimpleWorker {
+             if (Range.getEndPosition(edits[writeIndex].range).equals(Range.getStartPosition(edits[readIndex].range))) {
+                 edits[writeIndex].range = Range.fromPositions(Range.getStartPosition(edits[writeIndex].range), Range.getEndPosition(edits[readIndex].range));
+                 edits[writeIndex].text += edits[readIndex].text;
+-            }
+-            else {
++            } else {
+                 writeIndex++;
+                 edits[writeIndex] = edits[readIndex];
+             }
+         }
+         edits.length = writeIndex + 1;
+-        for (let { range, text, eol } of edits) {
++        for (let {
++                range,
++                text,
++                eol
++            } of edits) {
+             if (typeof eol === 'number') {
+                 lastEol = eol;
+             }
+@@ -163,7 +203,10 @@ export class BaseEditorSimpleWorker {
+             }
+             // make sure diff won't take too long
+             if (Math.max(text.length, original.length) > EditorSimpleWorker._diffLimit) {
+-                result.push({ range, text });
++                result.push({
++                    range,
++                    text
++                });
+                 continue;
+             }
+             // compute diff between original and edit.text
+@@ -174,7 +217,12 @@ export class BaseEditorSimpleWorker {
+                 const end = model.positionAt(editOffset + change.originalStart + change.originalLength);
+                 const newEdit = {
+                     text: text.substr(change.modifiedStart, change.modifiedLength),
+-                    range: { startLineNumber: start.lineNumber, startColumn: start.column, endLineNumber: end.lineNumber, endColumn: end.column }
++                    range: {
++                        startLineNumber: start.lineNumber,
++                        startColumn: start.column,
++                        endLineNumber: end.lineNumber,
++                        endColumn: end.column
++                    }
+                 };
+                 if (model.getValueInRange(newEdit.range) !== newEdit.text) {
+                     result.push(newEdit);
+@@ -182,7 +230,16 @@ export class BaseEditorSimpleWorker {
+             }
+         }
+         if (typeof lastEol === 'number') {
+-            result.push({ eol: lastEol, text: '', range: { startLineNumber: 0, startColumn: 0, endLineNumber: 0, endColumn: 0 } });
++            result.push({
++                eol: lastEol,
++                text: '',
++                range: {
++                    startLineNumber: 0,
++                    startColumn: 0,
++                    endLineNumber: 0,
++                    endColumn: 0
++                }
++            });
+         }
+         return result;
+     }
+@@ -203,7 +260,9 @@ export class BaseEditorSimpleWorker {
+         return computeDefaultDocumentColors(model);
+     }
+     // ---- BEGIN suggest --------------------------------------------------------------------------
+-    static { this._suggestionsLimit = 10000; }
++    static {
++        this._suggestionsLimit = 10000;
++    }
+     async $textualSuggest(modelUrls, leadingWord, wordDef, wordDefFlags) {
+         const sw = new StopWatch();
+         const wordDefRegExp = new RegExp(wordDef, wordDefFlags);
+@@ -223,7 +282,10 @@ export class BaseEditorSimpleWorker {
+                 }
+             }
+         }
+-        return { words: Array.from(seen), duration: sw.elapsed() };
++        return {
++            words: Array.from(seen),
++            duration: sw.elapsed()
++        };
+     }
+     // ---- END suggest --------------------------------------------------------------------------
+     //#region -- word ranges --
+@@ -271,7 +333,10 @@ export class BaseEditorSimpleWorker {
+             };
+         }
+         const selectionText = model.getValueInRange(range);
+-        const wordRange = model.getWordAtPosition({ lineNumber: range.startLineNumber, column: range.startColumn }, wordDefRegExp);
++        const wordRange = model.getWordAtPosition({
++            lineNumber: range.startLineNumber,
++            column: range.startColumn
++        }, wordDefRegExp);
+         if (!wordRange) {
+             return null;
+         }
+@@ -317,9 +382,13 @@ export class EditorSimpleWorker extends BaseEditorSimpleWorker {
+             };
+             if (!isESM) {
+                 require([`${moduleId}`], onModuleCallback, reject);
+-            }
+-            else {
++            } else {
+                 const url = FileAccess.asBrowserUri(`${moduleId}.js`).toString(true);
++                // if (process.env.NODE_ENV === "development") {
++                if (process.env.TURBOPACK) {
++                    reject();
++                    return;
++                }
+                 import(`${url}`).then(onModuleCallback).catch(reject);
+             }
+         });
+@@ -331,8 +400,7 @@ export class EditorSimpleWorker extends BaseEditorSimpleWorker {
+         }
+         try {
+             return Promise.resolve(this._foreignModule[method].apply(this._foreignModule, args));
+-        }
+-        catch (e) {
++        } catch (e) {
+             return Promise.reject(e);
+         }
+     }
